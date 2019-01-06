@@ -1,8 +1,12 @@
+const path = require('path')
 const appData = require('./data.json')
 const seller = appData.seller
 const goods = appData.goods
 const ratings = appData.ratings
-
+// __dirname 表示的是项目的目录
+function resolve (dir) {
+  return path.join(__dirname, dir)
+}
 module.exports = {
   css: {
     loaderOptions: {
@@ -16,6 +20,7 @@ module.exports = {
   },
   pluginOptions: {
     'cube-ui': {
+      // 后编译
       postCompile: true,
       theme: true
     }
@@ -43,6 +48,11 @@ module.exports = {
         })
       })
     }
-
+  },
+  chainWebpack (config) {
+    config.resolve.alias
+      .set('components', resolve('src/components'))
+      .set('common', resolve('src/common'))
+      .set('api', resolve('src/api'))
   }
 }
