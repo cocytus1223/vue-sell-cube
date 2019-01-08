@@ -45,11 +45,20 @@
         </cube-scroll-nav-panel>
       </cube-scroll-nav>
     </div>
+    <div class="shop-cart-wrapper">
+      <shop-cart
+        :deliveryPrice="seller.deliveryPrice"
+        :minPrice="seller.minPrice"
+      >
+
+      </shop-cart>
+    </div>
   </div>
 </template>
 
 <script>
 import { getGoods } from 'api'
+import ShopCart from 'components/shop-cart/shop-cart'
 export default {
   name: 'goods',
   props: {
@@ -76,6 +85,14 @@ export default {
         this.goods = goods
       })
     }
+  },
+  computed: {
+    seller () {
+      return this.data.seller
+    }
+  },
+  components: {
+    ShopCart
   }
 }
 </script>
@@ -169,4 +186,16 @@ export default {
           text-decoration line-through
           font-size $fontsize-small-s
           color $color-light-grey
+    .cart-control-wrapper
+      position absolute
+      right 0
+      bottom 12px
+
+.shop-cart-wrapper
+  position absolute
+  left 0
+  bottom 0
+  z-index 50
+  width 100%
+  height 48px
 </style>
