@@ -7,6 +7,34 @@
         :options="scrollOptions"
         v-if="goods.length"
       >
+        <template
+          slot="bar"
+          slot-scope="props"
+        >
+          <cube-scroll-nav-bar
+            direction="vertical"
+            :labels="props.labels"
+            :txts="barTxts"
+            :current="props.current"
+          >
+            <template slot-scope="props">
+              <div class="text">
+                <support-icon
+                  v-if="props.txt.type>=1"
+                  :size=3
+                  :type="props.txt.type"
+                ></support-icon>
+                <span>{{props.txt.name}}</span>
+                <span
+                  class="num"
+                  v-if="props.txt.count"
+                >
+                  <bubble :num="props.txt.count"></bubble>
+                </span>
+              </div>
+            </template>
+          </cube-scroll-nav-bar>
+        </template>
         <cube-scroll-nav-panel
           v-for="good in goods"
           :key="good.name"
@@ -68,6 +96,8 @@
 import { getGoods } from 'api'
 import ShopCart from 'components/shop-cart/shop-cart'
 import CartControl from 'components/cart-control/cart-control'
+import SupportIcon from 'components/support-icon/support-icon'
+import Bubble from 'components/bubble/bubble'
 export default {
   name: 'goods',
   props: {
@@ -112,11 +142,29 @@ export default {
         })
       })
       return ret
+    },
+    barTxts () {
+      let res = []
+      this.goods.forEach((good) => {
+        const { type, name, foods } = good
+        let count = 0
+        foods.forEach((food) => {
+          count += food.count || 0
+        })
+        res.push({
+          type,
+          name,
+          count
+        })
+      })
+      return res
     }
   },
   components: {
     ShopCart,
-    CartControl
+    CartControl,
+    SupportIcon,
+    Bubble
   }
 }
 </script>
