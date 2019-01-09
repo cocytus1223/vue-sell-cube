@@ -39,6 +39,12 @@
                     v-show="food.oldPrice"
                   >￥{{food.oldPrice}}</span>
                 </div>
+                <div class="cart-control-wrapper">
+                  <cart-control
+                    :food="food"
+                    @add="onAdd"
+                  ></cart-control>
+                </div>
               </div>
             </li>
           </ul>
@@ -47,8 +53,10 @@
     </div>
     <div class="shop-cart-wrapper">
       <shop-cart
-        :deliveryPrice="seller.deliveryPrice"
-        :minPrice="seller.minPrice"
+        ref="shopCart"
+        :select-foods="selectFoods"
+        :delivery-price="seller.deliveryPrice"
+        :min-price="seller.minPrice"
       >
 
       </shop-cart>
@@ -59,6 +67,7 @@
 <script>
 import { getGoods } from 'api'
 import ShopCart from 'components/shop-cart/shop-cart'
+import CartControl from 'components/cart-control/cart-control'
 export default {
   name: 'goods',
   props: {
@@ -84,15 +93,30 @@ export default {
       getGoods().then(goods => {
         this.goods = goods
       })
+    },
+    onAdd (el) {
+      this.$refs.shopCart.drop(el)
     }
   },
   computed: {
     seller () {
       return this.data.seller
+    },
+    selectFoods () {
+      let ret = []
+      this.goods.forEach((good) => {
+        good.foods.forEach((food) => {
+          if (food.count) {
+            ret.push(food)
+          }
+        })
+      })
+      return ret
     }
   },
   components: {
-    ShopCart
+    ShopCart,
+    CartControl
   }
 }
 </script>
@@ -190,7 +214,6 @@ export default {
       position absolute
       right 0
       bottom 12px
-
 .shop-cart-wrapper
   position absolute
   left 0

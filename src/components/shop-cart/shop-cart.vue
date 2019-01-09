@@ -71,6 +71,19 @@
 </template>
 
 <script>
+import Bubble from 'components/bubble/bubble'
+const BALL_LEN = 10
+const innerClsHook = 'inner-hook'
+// 默认隐藏的小球
+function createBalls () {
+  let ret = []
+  for (let i = 0; i < BALL_LEN; i++) {
+    ret.push({
+      show: false
+    })
+  }
+  return ret
+}
 export default {
   name: 'shop-cart',
   props: {
@@ -87,6 +100,11 @@ export default {
     minPrice: {
       type: Number,
       default: 0
+    }
+  },
+  data () {
+    return {
+      balls: createBalls()
     }
   },
   computed: {
@@ -122,6 +140,64 @@ export default {
         return 'enough'
       }
     }
+  },
+  created () {
+    this.dropBalls = []
+  },
+  methods: {
+    // 记录即将下落的小球元素
+    drop (el) {
+      for (let i = 0; i < this.balls.length; i++) {
+        const ball = this.balls[i]
+        if (!ball.show) {
+          ball.show = true
+          ball.el = el
+          this.dropBalls.push(ball)
+          return
+        }
+      }
+    },
+    // 钩子函数
+    beforeDrop (el) {
+      // 找到最后添加的小球
+      const ball = this.dropBalls[this.dropBalls.length - 1]
+      const rect = ball.el.getBoundingClientRect()
+      // 小球开始的x距离
+      const x = rect.left - 32
+      // 小球开始的y距离
+      const y = -(window.innerHeight - rect.top - 22)
+      el.style.display = ''
+      el.style.transform = el.webkitTransform = `translate3d(0,${y}px,0)`
+      const inner = el.getElementsByClassName(innerClsHook)[0]
+      inner.style.transform = el.webkitTransform = `translate3d(${x}px, 0, 0)`
+    },
+    dropping (el, done) {
+      // 重绘
+      this._reflow = document.body.offsetHeight
+      // 归位
+      el.style.transform = el.webkitTransform = `translate3d(0,0,0)`
+      const inner = el.getElementsByClassName(innerClsHook)[0]
+      inner.style.transform = el.webkitTransform = `translate3d(0,0,0)`
+      el.addEventListener('transitionend', done)
+    },
+    afterDrop (el) {
+      // 找到最前面添加的小球
+      const ball = this.dropBalls.shift()
+      if (ball) {
+        // 隐藏小球
+        ball.show = false
+        el.style.display = 'none'
+      }
+    },
+    togglelist () {
+
+    },
+    toPay () {
+
+    }
+  },
+  components: {
+    Bubble
   }
 }
 </script>
