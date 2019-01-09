@@ -75,7 +75,7 @@ import Bubble from 'components/bubble/bubble'
 const BALL_LEN = 10
 const innerClsHook = 'inner-hook'
 // 默认隐藏的小球
-function createBalls () {
+function createBalls() {
   let ret = []
   for (let i = 0; i < BALL_LEN; i++) {
     ret.push({
@@ -89,7 +89,7 @@ export default {
   props: {
     selectFoods: {
       type: Array,
-      default () {
+      default() {
         return []
       }
     },
@@ -102,28 +102,28 @@ export default {
       default: 0
     }
   },
-  data () {
+  data() {
     return {
       balls: createBalls()
     }
   },
   computed: {
     // 价格总和
-    totalPrice () {
+    totalPrice() {
       let total = 0
       this.selectFoods.forEach((food) => {
         total += food.price * food.count
       })
       return total
     },
-    totalCount () {
+    totalCount() {
       let count = 0
       this.selectFoods.forEach((food) => {
         count += food.count
       })
       return count
     },
-    payDesc () {
+    payDesc() {
       if (this.totalPrice === 0) {
         return `￥${this.minPrice}元起送`
       } else if (this.totalPrice < this.minPrice) {
@@ -133,7 +133,7 @@ export default {
         return '去结算'
       }
     },
-    payClass () {
+    payClass() {
       if (!this.totalCount || this.totalPrice < this.minPrice) {
         return 'not-enough'
       } else {
@@ -141,12 +141,13 @@ export default {
       }
     }
   },
-  created () {
+  created() {
     this.dropBalls = []
+    this.listFold = true
   },
   methods: {
     // 记录即将下落的小球元素
-    drop (el) {
+    drop(el) {
       for (let i = 0; i < this.balls.length; i++) {
         const ball = this.balls[i]
         if (!ball.show) {
@@ -158,7 +159,7 @@ export default {
       }
     },
     // 钩子函数
-    beforeDrop (el) {
+    beforeDrop(el) {
       // 找到最后添加的小球
       const ball = this.dropBalls[this.dropBalls.length - 1]
       const rect = ball.el.getBoundingClientRect()
@@ -171,7 +172,7 @@ export default {
       const inner = el.getElementsByClassName(innerClsHook)[0]
       inner.style.transform = el.webkitTransform = `translate3d(${x}px, 0, 0)`
     },
-    dropping (el, done) {
+    dropping(el, done) {
       // 重绘
       this._reflow = document.body.offsetHeight
       // 归位
@@ -180,7 +181,7 @@ export default {
       inner.style.transform = el.webkitTransform = `translate3d(0,0,0)`
       el.addEventListener('transitionend', done)
     },
-    afterDrop (el) {
+    afterDrop(el) {
       // 找到最前面添加的小球
       const ball = this.dropBalls.shift()
       if (ball) {
@@ -189,10 +190,35 @@ export default {
         el.style.display = 'none'
       }
     },
-    togglelist () {
-
+    togglelist() {
+      if (this.listFold) {
+        if (!this.totalCount) {
+          return
+        }
+        this.listFold = false
+        this._showShopCartList()
+      } else {
+        this.listFold = true
+        this._hideShopCartList()
+      }
     },
-    toPay () {
+    _showShopCartList() {
+      this.shopCartListComp = this.shopCartListComp || this.$createShopCartList({
+        $props: {
+          selectFoods: 'selectFoods'
+        },
+        $events: {
+          hide: () => {
+            this.listFold = true
+          }
+        }
+      })
+      this.shopCartListComp.show()
+    },
+    _hideShopCartList() {
+      this.shopCartListComp.hide()
+    },
+    toPay() {
 
     }
   },
