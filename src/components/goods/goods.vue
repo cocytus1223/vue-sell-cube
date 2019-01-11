@@ -103,12 +103,12 @@ export default {
   props: {
     data: {
       type: Object,
-      default () {
+      default() {
         return {}
       }
     }
   },
-  data () {
+  data() {
     return {
       goods: [],
       selectedFood: {},
@@ -119,20 +119,23 @@ export default {
     }
   },
   methods: {
-    fetch () {
-      getGoods().then(goods => {
-        this.goods = goods
-      })
+    fetch() {
+      if (!this.fetched) {
+        this.fetched = true
+        getGoods().then(goods => {
+          this.goods = goods
+        })
+      }
     },
-    onAdd (el) {
+    onAdd(el) {
       this.$refs.shopCart.drop(el)
     }
   },
   computed: {
-    seller () {
+    seller() {
       return this.data.seller
     },
-    selectFoods () {
+    selectFoods() {
       let ret = []
       this.goods.forEach((good) => {
         good.foods.forEach((food) => {
@@ -143,7 +146,7 @@ export default {
       })
       return ret
     },
-    barTxts () {
+    barTxts() {
       let res = []
       this.goods.forEach((good) => {
         const { type, name, foods } = good

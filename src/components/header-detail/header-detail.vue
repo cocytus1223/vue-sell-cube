@@ -57,7 +57,9 @@
 <script>
 import Star from 'components/star/star'
 import SupportIcon from 'components/support-icon/support-icon'
+import popupMixin from 'common/mixins/popup'
 export default {
+  mixins: [popupMixin],
   name: 'header-detail',
   props: {
     seller: {
@@ -65,19 +67,6 @@ export default {
       default () {
         return {}
       }
-    }
-  },
-  data () {
-    return {
-      visible: false
-    }
-  },
-  methods: {
-    show () {
-      this.visible = true
-    },
-    hide () {
-      this.visible = false
     }
   },
   components: {

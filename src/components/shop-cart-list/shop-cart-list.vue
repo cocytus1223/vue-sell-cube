@@ -8,11 +8,17 @@
       type="shop-cart-list"
       @mask-click="maskClick"
     >
-      <transition name="move" @after-leave="onLeave">
+      <transition
+        name="move"
+        @after-leave="onLeave"
+      >
         <div v-show="visible">
           <div class="list-header">
             <h1 class="title">购物车</h1>
-            <span class="empty">清空</span>
+            <span
+              @click="empty"
+              class="empty"
+            >清空</span>
           </div>
           <cube-scroll
             class="list-content"
@@ -29,7 +35,10 @@
                   <span>￥{{food.price*food.count}}</span>
                 </div>
                 <div class="cart-control-wrapper">
-                  <cart-control :food="food"></cart-control>
+                  <cart-control
+                    @add="onAdd"
+                    :food="food"
+                  ></cart-control>
                 </div>
               </li>
             </ul>
@@ -42,11 +51,14 @@
 
 <script>
 import CartControl from 'components/cart-control/cart-control'
+import popupMixin from 'common/mixins/popup'
 
-const EVENT_HIDE = 'hide'
 const EVENT_LEAVE = 'leave'
+const EVENT_ADD = 'add'
+const EVENT_SHOW = 'show'
 
 export default {
+  mixins: [popupMixin],
   name: 'shop-cart-list',
   props: {
     selectFoods: {
@@ -56,24 +68,36 @@ export default {
       }
     }
   },
-  data() {
-    return {
-      visible: false
-    }
+  created() {
+    this.$on(EVENT_SHOW, () => {
+      this.$nextTick(() => {
+        this.$refs.listContent.refresh()
+      })
+    })
   },
   methods: {
-    show() {
-      this.visible = true
-    },
-    hide() {
-      this.visible = false
-      this.$emit(EVENT_HIDE)
-    },
     onLeave() {
       this.$emit(EVENT_LEAVE)
     },
     maskClick() {
       this.hide()
+    },
+    onAdd(target) {
+      this.$emit(EVENT_ADD, target)
+    },
+    empty() {
+      this.dialogComp = this.$createDialog({
+        type: 'confirm',
+        content: '清空购物车吗？',
+        $events: {
+          confirm: () => {
+            this.selectFoods.forEach((food) => {
+              food.count = 0
+            })
+            this.hide()
+          }
+        }
+      }).show()
     }
   },
   components: {
