@@ -43,6 +43,7 @@
         >
           <ul>
             <li
+              @click="selectFood(food)"
               v-for="food in good.foods"
               :key="food.name"
               class="food-item"
@@ -98,6 +99,7 @@ import ShopCart from 'components/shop-cart/shop-cart'
 import CartControl from 'components/cart-control/cart-control'
 import SupportIcon from 'components/support-icon/support-icon'
 import Bubble from 'components/bubble/bubble'
+
 export default {
   name: 'goods',
   props: {
@@ -129,6 +131,18 @@ export default {
     },
     onAdd(el) {
       this.$refs.shopCart.drop(el)
+    },
+    selectFood(food) {
+      this.selectedFood = food
+      this._showFood()
+    },
+    _showFood() {
+      this.foodComp = this.foodComp || this.$createFood({
+        $props: {
+          food: 'selectedFood'
+        }
+      })
+      this.foodComp.show()
     }
   },
   computed: {
